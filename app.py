@@ -117,7 +117,6 @@ def fetch_race_data(place_code: str, race_number: int, date: str) -> Race | None
         except:
             st = 0.0
 
-        # ★ Boat クラスに合わせて完全修正済み
         boat = Boat(
             number=idx,
             name=name,
