@@ -18,6 +18,34 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 JST = timezone(timedelta(hours=9))
 
 # ============================================================
+#  LINE Messaging API（Notify の代替）
+# ============================================================
+LINE_ACCESS_TOKEN = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
+LINE_USER_ID = os.getenv("LINE_USER_ID")  # ← Secrets に追加が必要
+
+def send_line_message(text: str):
+    """Messaging API でプッシュ通知を送る"""
+    if not LINE_ACCESS_TOKEN or not LINE_USER_ID:
+        print("LINE Messaging API の環境変数が不足しています。通知スキップ。")
+        return
+
+    url = "https://api.line.me/v2/bot/message/push"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
+    }
+    body = {
+        "to": LINE_USER_ID,
+        "messages": [
+            {"type": "text", "text": text}
+        ]
+    }
+
+    res = requests.post(url, headers=headers, json=body)
+    print("LINE送信:", res.status_code, res.text)
+
+
+# ============================================================
 #  対象場
 # ============================================================
 TARGET_PLACES = {
@@ -131,6 +159,9 @@ def save_prediction(race: Race, pred: dict, date: str):
 # ============================================================
 def main():
     today = datetime.now(JST).strftime("%Y%m%d")
+    notify_text = f"【自動予測開始】\n対象日: {today}"
+
+    send_line_message(notify_text)
 
     for place_code, place_name in TARGET_PLACES.items():
         print(f"=== {place_name}（{place_code}）開催チェック ===")
@@ -152,4 +183,9 @@ def main():
 
             print(f"{place_name}{r}R：保存完了")
 
+    send_line_message("【自動予測完了】")
     print("=== 自動予測完了 ===")
+
+
+if __name__ == "__main__":
+    main()
