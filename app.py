@@ -18,13 +18,12 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 JST = timezone(timedelta(hours=9))
 
 # ============================================================
-#  LINE Messaging API（Notify の代替）
+#  LINE Messaging API
 # ============================================================
 LINE_ACCESS_TOKEN = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
-LINE_USER_ID = os.getenv("LINE_USER_ID")  # ← Secrets に追加済み
+LINE_USER_ID = os.getenv("LINE_USER_ID")
 
 def send_line_message(text: str):
-    """Messaging API でプッシュ通知を送る"""
     if not LINE_ACCESS_TOKEN or not LINE_USER_ID:
         print("LINE Messaging API の環境変数が不足しています。通知スキップ。")
         return
@@ -36,9 +35,7 @@ def send_line_message(text: str):
     }
     body = {
         "to": LINE_USER_ID,
-        "messages": [
-            {"type": "text", "text": text}
-        ]
+        "messages": [{"type": "text", "text": text}]
     }
 
     res = requests.post(url, headers=headers, json=body)
@@ -46,37 +43,40 @@ def send_line_message(text: str):
 
 
 # ============================================================
-#  対象場
+#  対象場（昼3＋夜3の最適セット）
 # ============================================================
 TARGET_PLACES = {
-    "12": "住之江",
-    "19": "下関",
-    "24": "大村",
+    "12": "住之江",   # 夜
+    "19": "下関",     # 夜
+    "24": "大村",     # 夜
+    "18": "徳山",     # 昼
+    "17": "宮島",     # 昼
+    "23": "唐津",     # 昼
 }
 
 # ============================================================
-#  安定した GET リクエスト（timeout + retry）
+#  安定した GET（timeout + retry）
 # ============================================================
 def safe_get(url, timeout=30, retries=3):
     for i in range(retries):
         try:
             return requests.get(url, timeout=timeout)
-        except requests.exceptions.Timeout:
-            print(f"[Timeout] {url}  ({i+1}/{retries})")
         except Exception as e:
-            print(f"[Error] {url} : {e}")
-
+            print(f"[Error] {url} : {e} ({i+1}/{retries})")
     print(f"[Failed] {url} → スキップ")
     return None
 
 
 # ============================================================
-#  開催チェック
+#  開催チェック（PC版に統一）
 # ============================================================
 def is_race_held(place_code: str, date: str) -> bool:
-    url = f"https://www.boatrace.jp/owpc/pc/race/index?jcd={place_code}&hd={date}"
-    res = safe_get(url)
+    url = (
+        "https://www.boatrace.jp/owpc/pc/race/index"
+        f"?jcd={place_code}&hd={date}"
+    )
 
+    res = safe_get(url)
     if res is None:
         return False
 
@@ -84,7 +84,7 @@ def is_race_held(place_code: str, date: str) -> bool:
 
 
 # ============================================================
-#  出走表取得
+#  出走表取得（PC版に統一 + 安定化）
 # ============================================================
 def fetch_race_data(place_code: str, race_number: int, date: str) -> Race | None:
     url = (
@@ -108,9 +108,12 @@ def fetch_race_data(place_code: str, race_number: int, date: str) -> Race | None
         if len(cols) < 9:
             continue
 
+        # --- 選手名の安全取得 ---
         raw_name = cols[2].get_text(strip=True)
-        name = raw_name.split()[-1]
+        parts = raw_name.split()
+        name = parts[-1] if parts else ""
 
+        # --- ST の安全取得 ---
         raw_st = cols[4].get_text(strip=True).split()
         try:
             st = float(raw_st[-1])
@@ -188,7 +191,3 @@ def main():
 
     send_line_message("【自動予測完了】")
     print("=== 自動予測完了 ===")
-
-
-if __name__ == "__main__":
-    main()
