@@ -21,7 +21,7 @@ JST = timezone(timedelta(hours=9))
 #  LINE Messaging API（Notify の代替）
 # ============================================================
 LINE_ACCESS_TOKEN = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
-LINE_USER_ID = os.getenv("LINE_USER_ID")  # ← Secrets に追加が必要
+LINE_USER_ID = os.getenv("LINE_USER_ID")  # ← Secrets に追加済み
 
 def send_line_message(text: str):
     """Messaging API でプッシュ通知を送る"""
@@ -117,12 +117,17 @@ def fetch_race_data(place_code: str, race_number: int, date: str) -> Race | None
         except:
             st = 0.0
 
+        # ★ Boat クラスに合わせて完全修正済み
         boat = Boat(
             number=idx,
             name=name,
             st=st,
-            motor=0.0,
             win_rate=0.0,
+            motor=0.0,
+            boat=0.0,
+            local_win_rate=0.0,
+            course_stats={},
+            accident_rate=0.0
         )
         boats.append(boat)
 
@@ -159,9 +164,8 @@ def save_prediction(race: Race, pred: dict, date: str):
 # ============================================================
 def main():
     today = datetime.now(JST).strftime("%Y%m%d")
-    notify_text = f"【自動予測開始】\n対象日: {today}"
 
-    send_line_message(notify_text)
+    send_line_message(f"【自動予測開始】\n対象日: {today}")
 
     for place_code, place_name in TARGET_PLACES.items():
         print(f"=== {place_name}（{place_code}）開催チェック ===")
