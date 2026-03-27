@@ -1,0 +1,4 @@
+supabase
+requests
+numpy
+python-dotenv
