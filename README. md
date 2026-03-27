@@ -1,0 +1,32 @@
+project/
+├── main.py
+├── src/
+│   ├── predict_engine/
+│   │   ├── __init__.py
+│   │   ├── predictor.py
+│   │   ├── scenario_analyzer.py
+│   │   └── weight_manager.py
+│   │
+│   ├── nightly_learning/
+│   │   ├── __init__.py
+│   │   ├── fetch_results.py
+│   │   ├── learner.py
+│   │   ├── version_up_judger.py
+│   │   └── summary_generator.py
+│   │
+│   ├── supabase_client/
+│   │   ├── __init__.py
+│   │   ├── client.py
+│   │   ├── predictions.py
+│   │   ├── results.py
+│   │   ├── exhibition_history.py
+│   │   ├── pair_profiles.py
+│   │   ├── ai_versions.py
+│   │   └── system_status.py
+│   │
+│   ├── line_notifier/
+│   │   ├── __init__.py
+│   │   └── line_notifier.py
+│
+├── requirements.txt
+└── README.md
