@@ -1,4 +1,4 @@
 import  time
 print("start")
-while true:
+while True:
     time.sleep(60)
