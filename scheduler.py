@@ -13,10 +13,10 @@ from datetime import datetime, timedelta
 
 # ============================
 
-SUPABASE_URL = ‘https://xjccczavddenpcdrzywi.supabase.co’
-SUPABASE_KEY = os.environ.get(‘SUPABASE_KEY’, ‘’)
-LINE_TOKEN = os.environ.get(‘LINE_TOKEN’, ‘’)
-LINE_API_URL = ‘https://api.line.me/v2/bot/message/broadcast’
+SUPABASE_URL = 'https://xjccczavddenpcdrzywi.supabase.co'
+SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '')
+LINE_TOKEN = os.environ.get('LINE_TOKEN', '')
+LINE_API_URL = 'https://api.line.me/v2/bot/message/broadcast'
 
 TARGET_VENUES = [1, 6, 12, 18, 24]
 VENUE_NAMES = {‘01’: ‘桐生’, ‘06’: ‘常滑’, ‘12’: ‘住之江’, ‘18’: ‘下関’, ‘24’: ‘大村’}
